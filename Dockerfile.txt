@@ -1,0 +1,22 @@
+# Usa a imagem oficial do .NET SDK
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /app
+
+# Copia csproj e restaura dependências
+COPY *.csproj ./
+RUN dotnet restore
+
+# Copia todo o código e publica
+COPY . ./
+RUN dotnet publish -c Release -o out
+
+# Cria a imagem final
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
+WORKDIR /app
+COPY --from=build /app/out ./
+
+# Porta que Render vai usar
+EXPOSE 10000
+
+# Comando para rodar o app
+ENTRYPOINT ["dotnet", "GestaoEquipamentos.dll"]
