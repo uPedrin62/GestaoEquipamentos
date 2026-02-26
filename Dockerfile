@@ -1,22 +1,23 @@
-# Etapa de build
+# Build
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /app
 
-# Copia csproj e restaura dependências
-COPY *.csproj ./
+# Copia tudo
+COPY . ./
+
+# Vai para a pasta do projeto
+WORKDIR /app/GestaoEquipamentos
+
+# Restaura
 RUN dotnet restore
 
-# Copia todo o código e publica
-COPY . ./
+# Publica
 RUN dotnet publish -c Release -o out
 
-# Imagem final
+# Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
-COPY --from=build /app/out ./
+COPY --from=build /app/GestaoEquipamentos/out ./
 
-# Porta usada pelo Render
 EXPOSE 10000
-
-# Rodar aplicação
 ENTRYPOINT ["dotnet", "GestaoEquipamentos.dll"]
