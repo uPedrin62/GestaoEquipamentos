@@ -1,23 +1,19 @@
-# Build
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /app
 
 # Copia tudo
-COPY . ./
+COPY . .
 
-# Vai para a pasta do projeto
-WORKDIR /app/GestaoEquipamentos
-
-# Restaura
-RUN dotnet restore
+# Restaura usando o csproj diretamente
+RUN dotnet restore GestaoEquipamentos.csproj
 
 # Publica
-RUN dotnet publish -c Release -o out
+RUN dotnet publish GestaoEquipamentos.csproj -c Release -o out
 
 # Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
-COPY --from=build /app/GestaoEquipamentos/out ./
+COPY --from=build /app/out .
 
 EXPOSE 10000
-ENTRYPOINT ["dotnet", "GestaoEquipamentos.dll"]
+ENTRYPOINT ["dotnet", "GestaoEquipamentos.csproj"]
